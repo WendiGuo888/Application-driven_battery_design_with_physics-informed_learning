@@ -1,0 +1,144 @@
+{
+    "cell_pairs": [
+        [
+            "cell01",
+            "cell02"
+        ],
+        [
+            "cell01",
+            "cell03"
+        ],
+        [
+            "cell04",
+            "cell05"
+        ],
+        [
+            "cell01",
+            "cell08"
+        ],
+        [
+            "cell06",
+            "cell07"
+        ],
+        [
+            "cell09",
+            "cell10"
+        ],
+        [
+            "cell11",
+            "cell12"
+        ],
+        [
+            "cell13",
+            "cell14"
+        ],
+        [
+            "cell15",
+            "cell16"
+        ],
+        [
+            "cell17",
+            "cell18"
+        ]
+    ],
+    "param_grid": {
+        "cell02": [
+            2500,
+            5e-06
+        ],
+        "cell03": [
+            1200,
+            1e-05
+        ],
+        "cell05": [
+            2500,
+            5e-06
+        ],
+        "cell07": [
+            600,
+            5e-06
+        ],
+        "cell08": [
+            3000,
+            0.0001
+        ],
+        "cell10": [
+            200,
+            5e-06
+        ],
+        "cell12": [
+            2000,
+            0.005
+        ],
+        "cell14": [
+            80,
+            2e-06
+        ],
+        "cell16": [
+            900,
+            2e-06
+        ],
+        "cell18": [
+            10,
+            1e-06
+        ]
+    },
+    "PARAM_MAP": {
+        "default": {
+            "pre_lr": 0.0002,
+            "pre_wd1": 0.3,
+            "pre_wzero": 100.0,
+            "src_wd1": 0.2,
+            "src_wmono": 10.0,
+            "src_aug": 0.02,
+            "tgt_wfit": 400.0,
+            "tgt_wd1": 15.0,
+            "tgt_wmono": 500.0,
+            "tgt_wphys_v": 10.0,
+            "tgt_wzero": 20.0,
+            "tgt_patience": 100
+        },
+        "cell03": {
+            "pre_lr": 0.0005,
+            "pre_wd1": 0.0,
+            "pre_wzero": 10.0,
+            "src_wd1": 10.0,
+            "src_wmono": 100.0,
+            "src_aug": 0.02,
+            "tgt_wfit": 50.0,
+            "tgt_wd1": 80.0,
+            "tgt_wmono": 500.0,
+            "tgt_wphys_v": 1.0,
+            "tgt_wzero": 100.0,
+            "tgt_patience": 100
+        },
+        "cell08": {
+            "pre_lr": 0.0005,
+            "pre_wd1": 0.0,
+            "pre_wzero": 10.0,
+            "src_wd1": 10.0,
+            "src_wmono": 100.0,
+            "src_aug": 0.02,
+            "tgt_wfit": 100.0,
+            "tgt_wd1": 50.0,
+            "tgt_wmono": 500.0,
+            "tgt_wphys_v": 10.0,
+            "tgt_wzero": 100.0,
+            "tgt_patience": 1000
+        },
+        "cell12": {
+            "pre_lr": 0.0005,
+            "pre_wd1": 0.0,
+            "pre_wzero": 10.0,
+            "src_wd1": 10.0,
+            "src_wmono": 100.0,
+            "src_aug": 0.02,
+            "tgt_wfit": 50.0,
+            "tgt_wd1": 50.0,
+            "tgt_wmono": 1000.0,
+            "tgt_wphys_v": 0.1,
+            "tgt_wzero": 100.0,
+            "tgt_patience": 2000
+        }
+    }
+}
