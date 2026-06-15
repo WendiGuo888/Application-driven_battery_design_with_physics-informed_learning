@@ -45,5 +45,5 @@ IV- Troubleshooting
 1. **PyTorch CUDA / Device Errors:**
    The code automatically detects and utilizes a GPU if available. If you encounter device mismatch errors (e.g., `RuntimeError: Expected all tensors to be on the same device`), ensure that your input data and model are both on the same device (CPU or CUDA). You can force the code to run on CPU by modifying the torch device configuration in the scripts.
 
-2 **SHAP Plotting Display:**
+2. **SHAP Plotting Display:**
    If the SHAP summary plots or heatmaps do not render text correctly, it is usually a matplotlib font compatibility issue. Ensure that `matplotlib` is updated to the version specified in `requirements.txt`.
