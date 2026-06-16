@@ -6,6 +6,7 @@ Figure 4 replica
 
 @author: wengu476
 """
+import os
 import torch.nn as nn
 import numpy as np
 import matplotlib.pyplot as plt
@@ -601,7 +602,7 @@ def pre_shape_to_physics_calibrated(
     model.eval()
     return model, (a_cal, b_cal)
 
-#%%
+#%% pre-shaping
 
 def micro_tune_with_early_stopping(
     model, phys_params,
@@ -728,7 +729,7 @@ def micro_tune_with_early_stopping(
     
     return model, history
 
-#%% can be used in paper
+#%% EOL extrapolation
 
 def get_extrapolated_eol_refined(model, X_sorted, F_sorted, Q_act_sorted, current_M, target_q=0.1, max_cycles=2500):
     model.eval()
@@ -885,7 +886,7 @@ def micro_tune_phys_adaptive(
 
     return model, phys_params, param_history, pure_duration
 
-#%%
+#%% NN vs. physics
 
 def validate_pinn_physics_flat(
     model, phys_params, X_src_all, M, a_cal, b_cal,
@@ -1034,48 +1035,6 @@ def validate_pinn_physics_flat(
 #%%
 
 def plot_Q_ALT_transfer(
-    F_tr, Q_tr,      
-    F_te, Q_te,      
-    F_hat, Q_hat,    
-    condition,
-    file_suffix,
-    ratio_early=None
-):
-    plt.figure(figsize=(12/2.52, 7.5/2.52))
-    plt.rcParams.update({'font.size': 12})
-
-
-    plt.scatter(F_tr, Q_tr*100, s=12, alpha=0.8,
-                color='tab:orange', label='Visible Data (Known)', zorder=3)
-
-
-    plt.scatter(F_te, Q_te*100, s=10, alpha=0.4,
-                color='grey', label='Future Truth (Hidden)', zorder=1)
-
-
-    order = np.argsort(F_hat)
-
-    plt.scatter(np.array(F_hat)[order], np.array(Q_hat)[order]*100, s=6, color='tab:blue')
-
-
-    plt.xlabel('EFC')
-    plt.ylabel(r'$Q_{loss}[\%]$')
-
-    title_parts = [condition]
-    if ratio_early is not None:
-        title_parts.append(f"Ratio={ratio_early:.2f}")
-    if file_suffix:
-        title_parts.append(file_suffix)
-
-    plt.title(" | ".join(title_parts))
-    plt.legend(fontsize=10, frameon=True, framealpha=0.85, loc='upper left')
-    plt.grid(True, linestyle='--', alpha=0.3)
-    plt.tight_layout()
-    plt.show()  
-
-#%%
-
-def plot_Q_ALT_transfer(
     F_tr, Q_tr,    
     F_te, Q_te,      
     F_hat, Q_hat,    
@@ -1113,24 +1072,28 @@ def plot_Q_ALT_transfer(
     plt.tight_layout()
     plt.show()
     
-#%% Embed physical parameters into randomly selected training and test datasets. Must be run before processing the training and test data without validation.
+
+#%% load data file
 
 def load_cells_to_dict(folder, cell_list):
-
     all_data = {}
-    for cell_id in cell_list:
+
+    unique_cells = set(cell_list)
+    print(f"📦 Total cells requested: {len(cell_list)} (Unique: {len(unique_cells)})")
+    
+    for cell_id in unique_cells:
         file_path = os.path.join(folder, f"{cell_id}.pkl")
         if os.path.exists(file_path):
             with open(file_path, 'rb') as f:
-               
                 all_data[cell_id] = pickle.load(f)
-            print(f"✅ Loaded {cell_id} successfully.")
+            print(f"  ✅ Loaded [{cell_id}] successfully.")
         else:
-            print(f"❌ Error: {file_path} not found.")
+            print(f"  ❌ Error: {file_path} not found.")
+            
     return all_data
 
+data_folder = 'sourcedata' 
 
-data_folder = 'data' 
 
 cell_ids = [
     'cell01', 'cell02', 'cell01', 'cell03', 
@@ -1437,14 +1400,14 @@ for s_idx, seed_val in enumerate(random_seeds):
 
                 print(f"\n🧪 Diagnosing the physics learning performance of source battery {src_id}...")
                 
-                # 2. 调用新函数
+     
                 validate_pinn_physics_flat(
                     model=model_src, 
                     phys_params=phys_params, 
-                    X_src_all=X_src_full, # 传入源电池数据矩阵
+                    X_src_all=X_src_full, 
                     M=M, 
-                    a_cal=a_s,           # 使用源电池定标系数 a_s
-                    b_cal=b_s,           # 使用源电池定标系数 b_s
+                    a_cal=a_s,          
+                    b_cal=b_s,           
                     device=device,
                     fec_col=0
                 )
