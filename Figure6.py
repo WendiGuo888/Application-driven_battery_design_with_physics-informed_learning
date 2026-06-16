@@ -275,10 +275,10 @@ if __name__ == "__main__":
     save_dir_final = "Saved_Results_2026" 
     current_tag = "diffusion"  
 
-    # 2. 加载数据
+
     data_assets = load_all_experiment_results_v2(save_dir_final, sensing_tag=current_tag)
 
-    # 3. 校验与解包
+
     if data_assets:
         landscape_snapshots = data_assets.get('landscape_snapshots')
         parity_data = data_assets.get('parity_data')
@@ -651,7 +651,7 @@ def plot_final_optimized_shap_threshold(
     num_samples=600,
     bg_samples=100,
     shap_nsamples=200,
-    seed=42
+    seed=2026
 ):
     import numpy as np
     import torch
@@ -660,27 +660,23 @@ def plot_final_optimized_shap_threshold(
     from matplotlib.colors import LinearSegmentedColormap
     import random
 
-    # ==========================================
-    # 1. 瞬时强制锁死随机性（确保每次调用时状态绝对一致）
-    # ==========================================
+
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
 
-    # 🌟 强力组合拳：强制所有底层算法使用确定性实现
+ 
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
-    # 某些特殊的底层算子可能需要这个变量来限制并行随机性
-    torch.use_deterministic_algorithms(False) # 如果设为True某些算子可能报错，保持False但依赖底层种子
+
+    torch.use_deterministic_algorithms(False) 
 
     model.eval()
     device = next(model.parameters()).device
 
-    # ==========================================
-    # 2. 特征名称映射
-    # ==========================================
+
     feature_name_mapping = {
         "Dneg_predicted": "Diffusion coef",
         "Lneg_predicted": "Thickness of NE",
@@ -719,9 +715,7 @@ def plot_final_optimized_shap_threshold(
         for name in raw_feature_names
     ]
 
-    # ==========================================
-    # 3. 选取目标 degradation 区间
-    # ==========================================
+
     with torch.no_grad():
         preds = model(X_full_tensor.to(device)).cpu().numpy().flatten()
 
@@ -736,9 +730,7 @@ def plot_final_optimized_shap_threshold(
 
     X_real = X_real.to(device)
 
-    # ==========================================
-    # 4. 构造解释数据（确定性强化）
-    # ==========================================
+
     X_mean = X_real.mean(dim=0, keepdim=True)
     X_std = X_real.std(dim=0, keepdim=True) + 1e-6
 
@@ -751,17 +743,11 @@ def plot_final_optimized_shap_threshold(
         noise = torch.randn(num_samples, device="cpu", generator=generator).to(device)
         X_explain[:, i] += noise * X_std[0, i] * 1.5
 
-    # ==========================================
-    # 5. 背景数据
-    # ==========================================
+
     bg_idx = torch.randperm(len(X_full_tensor), generator=generator)[:bg_samples]
     bg_data = X_full_tensor[bg_idx].to(device)
 
-    # ==========================================
-    # 6. SHAP 执行（🌟 彻底降伏底层飘移漏洞）
-    # ==========================================
-    # 在每次创建 Explainer 前，强制重置一次 Numpy 和 Python 的全局内部状态
-    # 这能确保即便 SHAP 调用了隐藏的无序并行 C++ 部分，其接收到的初始状态也是完全固定的
+
     import random as _rand
     import numpy as _np
     _rand.seed(seed)
@@ -769,9 +755,7 @@ def plot_final_optimized_shap_threshold(
 
     explainer = shap.GradientExplainer(model, bg_data)
 
-    # 🌟 核心改进：显式为 GradientExplainer 规定路径参数。
-    # 某些 SHAP 版本的 GradientExplainer 内部如果依赖于无序采样，
-    # 增加这个瞬时锁定的状态重置可以斩断一切环境带来的随机噪声干扰。
+
     shap_values = explainer.shap_values(
         X_explain.to(device),
         nsamples=shap_nsamples
@@ -787,9 +771,6 @@ def plot_final_optimized_shap_threshold(
 
     X_plot = X_explain.cpu().numpy()
 
-    # ==========================================
-    # 7. 排序（重要性）
-    # ==========================================
     mean_abs = np.mean(np.abs(shap_values), axis=0)
     sort_idx = np.argsort(mean_abs)[::-1]
 
@@ -797,15 +778,11 @@ def plot_final_optimized_shap_threshold(
     X_plot = X_plot[:, sort_idx]
     display_names = [display_names[i] for i in sort_idx]
 
-    # ==========================================
-    # 8. 粉紫色 colormap
-    # ==========================================
+
     morandi_refined = ['#5A6096', '#9B829C', '#D6A2BD', '#EBB9CB']
     morandi_cmap = LinearSegmentedColormap.from_list("morandi_err", morandi_refined, N=256)
 
-    # ==========================================
-    # 9. 扁平图
-    # ==========================================
+
     n_features = len(display_names)
     fig_width = 6.6
     fig_height = max(2.4, 0.20 * n_features)
