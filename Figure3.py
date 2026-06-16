@@ -14,28 +14,32 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from data_process_functionV2 import process_and_analyze_battery_data
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 from matplotlib.colors import LinearSegmentedColormap
 
-#%% Embed physical parameters into randomly selected training and test datasets. This function must be run before processing the training and test data without a validation set.
 
+#%% load data file
 
 def load_cells_to_dict(folder, cell_list):
     all_data = {}
-    for cell_id in cell_list:
+
+    unique_cells = set(cell_list)
+    print(f"📦 Total cells requested: {len(cell_list)} (Unique: {len(unique_cells)})")
+    
+    for cell_id in unique_cells:
         file_path = os.path.join(folder, f"{cell_id}.pkl")
         if os.path.exists(file_path):
             with open(file_path, 'rb') as f:
                 all_data[cell_id] = pickle.load(f)
-            print(f"✅ Loaded {cell_id} successfully.")
+            print(f"  ✅ Loaded [{cell_id}] successfully.")
         else:
-            print(f"❌ Error: {file_path} not found.")
+            print(f"  ❌ Error: {file_path} not found.")
+            
     return all_data
 
+data_folder = 'sourcedata' 
 
-data_folder = 'data' 
 
 cell_ids = [
     'cell01', 'cell02', 'cell01', 'cell03', 
@@ -45,16 +49,26 @@ cell_ids = [
     'cell15', 'cell16', 'cell17', 'cell18'
 ]
 
+
 data = load_cells_to_dict(data_folder, cell_ids)
 
-#%%
 
-result_epss = process_and_analyze_battery_data('data generation/CCCV generationv1.txt', 'epsspos', 2.9, 4.2)
-result_rpneg = process_and_analyze_battery_data('data generation/CCCV generationv2.txt', 'rpneg', 2.9, 4.2)
-result_Lneg = process_and_analyze_battery_data('data generation/CCCV generationv3.txt', 'Lneg', 2.9, 4.2)
-result_cspos = process_and_analyze_battery_data('data generation/CCCV generationv4.txt', 'cspos', 2.9, 4.2)
-result_Lpos = process_and_analyze_battery_data('data generation/CCCV generationv5.txt', 'Lpos', 2.9, 4.2)
-result_Dneg = process_and_analyze_battery_data('data generation/CCCV generationv6.txt', 'Dneg', 2.9, 4.2)
+#%% load virtual sensing data file
+
+sub_folder = 'sourcedata/processed_features'
+
+print("Directly loading the preprocessed cached data...")
+
+with open(f'{sub_folder}/battery_results.pkl', 'rb') as f:
+    saved_data = pickle.load(f)
+    result_rpneg = saved_data['rpneg']
+    result_Lneg  = saved_data['Lneg']
+    result_cspos = saved_data['cspos']
+    result_Dneg  = saved_data['Dneg']
+
+del saved_data
+
+print("[Dict Format] Data successfully loaded and assigned!")
 
 #%%
 
