@@ -25,7 +25,7 @@ from matplotlib.colors import LinearSegmentedColormap, Normalize
 
 #%% V2G Voltage Range Distribution (Figures 7d and 7e)
 
-file_path = 'V2G_Recovered_Fixed_20260520_0921.pkl'
+file_path = os.path.join('sourcedata', 'V2G_Recovered_Fixed_20260520_0921.pkl')
 with open(file_path, 'rb') as f:
     raw_data = pickle.load(f)
 
@@ -133,12 +133,22 @@ for metric_col, colorbar_label, suffix in metrics_to_plot:
 
 #%% load data (Figure 7a,b and c)
 
+import os
+import pickle
+import numpy as np
+
 print("\n" + "="*20 + " 🔍 Start immediate integrity verification of persisted data. " + "="*20)
 
-parity_file = "v2g_comprehensive_parity_results.pkl"
-snapshot_file = "v2g_landscape_snapshots.pkl"
-metrics_file = "v2g_metrics_hub.pkl"
 
+source_dir = "sourcedata"
+
+
+parity_file = os.path.join(source_dir, "v2g_comprehensive_parity_results.pkl")
+snapshot_file = os.path.join(source_dir, "v2g_landscape_snapshots.pkl")
+metrics_file = os.path.join(source_dir, "v2g_metrics_hub.pkl")
+
+
+all_files_ok = True
 
 if os.path.exists(parity_file):
     with open(parity_file, 'rb') as f:
@@ -146,6 +156,8 @@ if os.path.exists(parity_file):
     print(f"✅ [Parity Data Successfully Recovered] -> {len(parity_results)} independent model curve layers found.")
 else:
     print(f"❌ Specified Parity backup file not found: {parity_file}")
+    all_files_ok = False
+
 
 
 if os.path.exists(snapshot_file):
@@ -154,6 +166,8 @@ if os.path.exists(snapshot_file):
     print(f"✅ [SHAP Snapshot Successfully Recovered] -> Retrieved {len(v2g_landscape_snapshots)} evolving voltage windows.")
 else:
     print(f"❌ Specified SHAP snapshot backup file not found: {snapshot_file}")
+    all_files_ok = False
+
 
 
 if os.path.exists(metrics_file):
@@ -170,8 +184,15 @@ if os.path.exists(metrics_file):
                 print(f"     - model [{m_name}]: average MAE = {avg_mae:.4f}%")
 else:
     print(f"❌ Specified Metrics backup file not found: {metrics_file}")
+    all_files_ok = False
 
-print("\n🎉 [🔥 [Three-Way Integrity Check Passed] Data has been perfectly persisted and is ready for safe post-processing and manuscript figure generation！")
+
+
+print("\n" + "="*60)
+if all_files_ok:
+    print("🎉 [🔥 [Three-Way Integrity Check Passed] Data has been perfectly persisted and is ready for safe post-processing and manuscript figure generation！")
+else:
+    print("⚠️  [Integrity Check Failed] Some data files are missing! Please check the paths printed above.")
 print("="*60)
 
 #%% Parity plot (Figure 7a)
