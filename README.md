@@ -30,11 +30,10 @@ III- Demos and Instructions
 -----
 To replicate the analyses and regenerate the figures presented in the paper, you can run the corresponding Python scripts directly from the terminal. For example:
 
+Figure2.py
 Figure3.py
 Figure4.py
 Figure5.py
-Figure6.py
-Figure7.py
 
 Most Python scripts (e.g., standard data processing and figure plotting) should execute within a minute. However, scripts involving deep learning evaluations or SHAP feature importance analysis (such as calculating average importance across multiple random seeds) may take a few minutes to complete depending on your hardware.
 
