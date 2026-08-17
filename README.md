@@ -1,4 +1,4 @@
-Data and code necessary to replicate the results in the paper "Bridging battery design and health assessment through virtual sensing and physics-informed learning".
+Data and code necessary to replicate the results in the paper "Revealing battery aging dynamics and electrode design states with physics-informed AI".
 
 
 The battery aging dataset is publicly available at https://doi.org/10.5281/ zenodo.16538328 and https://doi.org/10.5281/zenodo.20679088.
